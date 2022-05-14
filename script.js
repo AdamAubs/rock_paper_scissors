@@ -1,76 +1,118 @@
-//Initial score start
-let compterScore = 0;
-let playerScore = 0
-let drawScore = 0
+const choices = document.querySelectorAll('.choices')
+const restart = document.getElementById('restart')
+const result = document.getElementById('result')
+const score = document.getElementById('score')
+const modal = document.querySelector('.modal')
 
-//Have the computer generate a random pick(rock paper or scissors)
-function computerPlay(){
-     let options = ['rock','paper','scissors']
-     return options[Math.floor(Math.random() * options.length)];
- }
+const scoreboard = {
+    player: 0,
+    computer: 0
+}
 
- //Determine who wins the round when comapred 
- //Also add point to winner
- function playRound(playerSelection, computerSelection) {
-     if(playerSelection === 'rock' && computerSelection === 'paper'){
-         compterScore++;
-         return computerWinsRound
-     }if(playerSelection === 'paper' && computerSelection === 'scissors'){
-         compterScore++;
-         return computerWinsRound
-     }if(playerSelection === 'scissors' && computerSelection === 'rock'){
-         compterScore++;
-         return computerWinsRound
-     }if(playerSelection === 'paper' && computerSelection === 'rock'){
-         playerScore++;
-         return playerWinsRound;
-     }if(playerSelection === 'scissors' && computerSelection === 'paper'){
-         playerScore++;
-         return playerWinsRound
-     }if(playerSelection === 'rock' && computerSelection === 'scissors'){
-         playerScore++;
-         return playerWinsRound
-     }if(playerSelection ===  computerSelection){
-         drawScore++;
-         return draw
+//Play Game
+function play(e){
+    restart.style.display ="inline-block"
+    const playerChoice = (e.target.id);
+    const computerChoice = getComputerChoice()
+    const winner = getWinner(playerChoice,computerChoice)
+    getScore(winner, computerChoice)
+
+}
+
+//Event listeners
+choices.forEach(choice => choice.addEventListener('click', play))
+
+//Get computer choice
+function getComputerChoice(){
+    const rand = Math.random();
+    if (rand < 0.34){
+        return 'rock';
+    }else if(rand <= 0.67){
+        return 'paper'
+    }else{
+        return 'scissors';
+    }
+}
+
+//Get Winner
+function getWinner(p,c){
+    if(p === c){
+        return 'draw'
+    }else if(p === 'rock'){
+     if(c === 'paper'){
+        return 'computer';
+    }else{
+        return 'player';
+    }
+
+    }else if(p === 'paper'){
+     if(c === 'scissors'){
+        return 'computer';
+     }else{
+        return 'player';
      }
-
- }
-//Variables for who wins the round
- let playerWinsRound = "You Win this Round!"
- let computerWinsRound = "You Lose this Round!"
- let draw = "Its a draw"
-
- //The number of rounds played with the output included 
- //Determines the winner of the 5 rounds played.
- function game(){
-    for(let i = 0; i <5; i++){
-        let userChoice = prompt('Rock, Paper, Scissors').toLowerCase();
-        let computerSelection = computerPlay();
-        let result = playRound(userChoice, computerSelection)
-        console.log("Round", i + 1)
-        console.log("user's choice", userChoice);
-        console.log("computer's choice", computerSelection);
-        console.log("Result is", result);
-        console.log("Computers Score", compterScore);
-        console.log("Your score", playerScore);
-        console.log("Tie score", drawScore);
-        console.log("//////////////")
-        console.log("//////////////")
+     
+    }else if(p === 'scissors'){
+     if(c === 'rock'){
+       return 'computer';
+     }else{
+       return 'player';
     }
-    if(compterScore > playerScore && compterScore > drawScore){
-        console.log("Sorry, the computer won")
-    }if(playerScore > compterScore && playerScore > drawScore){
-        console.log("Congradulations! You won!")
-    }if(drawScore === playerScore && drawScore > compterScore){
-        console.log("Congradulations! You won!")
-    }if(drawScore === compterScore && drawScore > playerScore){
-        console.log("Sorry, the computer won );")
-    }if(drawScore > playerScore && playerScore > compterScore){
-        console.log("Congradulations! You won!")
-    }if(drawScore > compterScore && compterScore > playerScore){
-        console.log("Sorry, the computer won );")
     }
- }
- //starts the game
- game()
+
+}
+
+function getScore(winner, computerChoice){
+    if(winner === 'player'){
+        //Inc player score
+        scoreboard.player++;
+        //show modal result
+        result.innerHTML =`
+        <h1 class="text-win">You Win</h1>
+        <p> Computer Chose <strong>${computerChoice}</strong></p>
+        `;
+    }else if(winner === 'computer'){
+        //Inc computer score
+        scoreboard.computer++;
+        //show modal result
+        result.innerHTML =`
+        <h1 class="text-lose">You Lose</h1>
+        <p> Computer chose <strong>${computerChoice}</strong></p>
+        `;
+    }else{
+        result.innerHTML =`
+        <h1 class="text-draw">It's a draw!</h1>
+        <p> Computer chose <strong>${computerChoice}</strong></p>
+        `;
+    }
+    //Show score
+    score.innerHTML = `
+        <p>Player: ${scoreboard.player}</p>
+        <p>Computer: ${scoreboard.computer}</p>
+        `;
+
+    
+    modal.style.display = 'block';
+    }
+    
+  
+
+//Restart Game
+function restartGame() {
+    scoreboard.player = 0;
+    scoreboard.computer = 0;
+    score.innerHTML = `
+    <p>Player: 0</p>
+    <p>Computer: 0</p>
+    `;
+}
+
+//Clear modal
+function clearModal(e){
+    if(e.target == modal){
+        modal.style.display = 'none'
+    }
+}
+
+restart.addEventListener('click', restartGame);
+window.addEventListener('click', clearModal)
